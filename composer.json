@@ -1,0 +1,17 @@
+{
+    "name": "determined-development/dd-boost",
+    "description": "Skills and guidelines for Laravel Boost",
+    "type": "library",
+    "require-dev": {
+        "laravel/boost": "^2.4"
+    },
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Samuel Levy",
+            "email": "sam@determineddevelopment.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "require": {}
+}
