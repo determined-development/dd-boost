@@ -1,7 +1,7 @@
 # Determined Development Laravel Boost Skills
 
-[![Latest Version on Packagist](https://img.shields.io/packagist/v/samlev/acl-for-laravel.svg?style=flat-square)](https://packagist.org/packages/samlev/acl-for-laravel)
-[![Total Downloads](https://img.shields.io/packagist/dt/samlev/acl-for-laravel.svg?style=flat-square)](https://packagist.org/packages/samlev/acl-for-laravel)
+[![Latest Version on Packagist](https://img.shields.io/packagist/v/determined-development/dd-boost.svg?style=flat-square)](https://packagist.org/packages/samlev/acl-for-laravel)
+[![Total Downloads](https://img.shields.io/packagist/dt/determined-development/dd-boost.svg?style=flat-square)](https://packagist.org/packages/samlev/acl-for-laravel)
 
 This repository contains custom Laravel Boost skills and guidance used by Determined Development projects.
 
