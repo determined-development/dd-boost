@@ -1,29 +1,42 @@
 ---
 name: chopping-code
-description: "Use this skill for chopping down long lines of code that are not able to be automatically chopped down by automated tools. Trigger when PHPCS reports a line length violation."
+description: "Agent runbook for resolving PHPCS line-length violations (>120 chars) that are not auto-fixable. Preserve behavior, improve readability, and keep peer formatting consistent."
 ---
-# Chopping down code
+# Chopping Down Code
 
-When lines are over 120 characters long, they should be chopped down. The goal when chopping down long lines is to maintain readability and consistency.
+Use this skill only when PHPCS reports a line-length violation and automatic fixers do not resolve it.
+
+## Mandatory policy
+
+- Keep runtime behavior identical; this skill is formatting-only.
+- Bring violating lines to 120 characters or fewer.
+- Prefer splits that make the most important logic easiest to scan.
+- Match nearby formatting patterns in the same file when they are already consistent.
 
 ## Candidate Selection
-When chopping down a long line with multiple candidates, emphasise readability of the most important part of the code.
+
+When multiple split points are possible, apply these in order:
+
+1. Break at natural semantic boundaries (method chaining, argument boundaries, array items).
+2. Keep the part of the expression that communicates intent most visible.
+3. Minimize diff noise; avoid restructuring unrelated code.
+4. Avoid awkward one-off wrapping that makes peers look inconsistent.
 
 ```php
-// Less understandable - focus is on the parts that are least likely to break. 
+// Avoid: this emphasizes less important details.
 $foo = str(Http::get(
     'https://example.com/search',
     ['term' => $term, 'orderBy' => $order_by],
 )->response()->body())->slug()->after('foo')->beforeLast('bar');
 
-// Better - focus is on the HTTP Request lifecycle
+// Better: this highlights the request lifecycle.
 $foo = str(
     Http::get('https://example.com/search', ['term' => $term, 'orderBy' => $order_by])
         ->response()
         ->body()
 )->slug()->after('foo')->beforeLast('bar');
 
-// Best - the focus is now on what is happening with the result
+// Best: this highlights how the final value is transformed.
 $foo = str(Http::get('https://example.com/search', ['term' => $term, 'orderBy' => $order_by])->response()->body())
     ->slug()
     ->after('foo')
@@ -31,7 +44,10 @@ $foo = str(Http::get('https://example.com/search', ['term' => $term, 'orderBy' =
 ```
 
 ## Maintain consistency
-If _all other_ peers are chopped down, then chop down short entities to maintain consistency.
+
+If all peer entries in the same structure are multi-line, split short peers to match.
+If peers are mixed and no pattern is dominant, only split the violating line.
+
 ```php
 return [
     'foo' => [
@@ -44,7 +60,7 @@ return [
         \App\Medium\LengthNamespace\Bar::class => \App\Medium\LengthNamespace\Buzz::class,
         \App\Medium\LengthNamespace\Baz::class => \App\Medium\LengthNamespace\Bing::class,
     ],
-    // Before: 'baz' => [1, 2, 3],
+    // Keep this multi-line because peer arrays are already multi-line.
     'baz' => [
         1,
         2,
