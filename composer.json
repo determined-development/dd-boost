@@ -3,7 +3,8 @@
     "description": "Skills and guidelines for Laravel Boost",
     "type": "library",
     "require-dev": {
-        "laravel/boost": "^2.4"
+        "laravel/boost": "^2.4",
+        "squizlabs/php_codesniffer": "^4.0"
     },
     "license": "MIT",
     "authors": [
@@ -12,6 +13,5 @@
             "email": "sam@determineddevelopment.com"
         }
     ],
-    "minimum-stability": "stable",
-    "require": {}
+    "minimum-stability": "stable"
 }

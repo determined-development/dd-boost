@@ -1,102 +1,71 @@
 ---
 name: phpcs
-description: "Use this skill for checking and correcting coding style violations. Trigger before finalizing changes to ensure your code matches the project's expected style. Trigger when the user requests that you fix the code style."
+description: "Agent runbook for PHP coding standards: run phpcbf first, run phpcs only when needed, then invoke the phpcs-violations skill only when a violation needs deeper interpretation before editing."
 ---
 @php
     /** @var \Laravel\Boost\Install\GuidelineAssist $assist */
 @endphp
-# PHP Code Sniffer
+# PHPCS Agent Runbook
 
-The PHP Code Sniffer tool is a code quality tool that consists of two parts:
-* `phpcs` - PHP Code Sniffer: the code sniffer.
-* `phpcbf` -  PHP Code Beautifier and Fixer: the automated style fixing tool.
+Use this skill for autonomous style enforcement on PHP changes.
 
-## PHP Code Sniffer
+## Mandatory policy
 
-This tool will report all code style violations.
+- If any PHP files were modified, run `{{ $assist->binCommand('phpcbf') }} --basepath=./ -q ./` first.
+- Do not run `phpcs` unless that `phpcbf` run returns a non-pass state.
+- After the first non-pass `phpcbf` run, run `phpcs` once to collect actionable violations, then fix code before re-running either command.
 
-### Usage:
-The basic command is: `phpcs [options] <file|directory>`
+## Canonical commands
 
-- Use `./` as the directory to scan all files in the project.
-- Use the option `--basepath=./` to remove the full system path from reported violations.
-- Use the option `-q` to reduce unnecessary output.
-- Use the option `--report=full` to see all found violations.
-
-Example:
 ```bash
-$ {{ $assist->binCommand('phpcs') }} --basepath=./ -q ./
-
-FILE: app/Models/User.php
----------------------------------------------------------------------------------
-FOUND 3 ERRORS AND 1 WARNING AFFECTING 3 LINES
----------------------------------------------------------------------------------
-196 | ERROR   | [x] Space after opening parenthesis of function call prohibited
-198 | ERROR   | [x] Expected 0 spaces before closing parenthesis; 3 found
-198 | WARNING | [ ] Line exceeds 120 characters; contains 128 characters
-203 | ERROR   | [x] Blank line found at end of control structure
----------------------------------------------------------------------------------
-PHPCBF CAN FIX THE 3 MARKED SNIFF VIOLATIONS AUTOMATICALLY
----------------------------------------------------------------------------------
-
-FILE: app/Services/FooService.php
-----------------------------------------------------------------------
-FOUND 0 ERRORS AND 1 WARNING AFFECTING 1 LINE
-----------------------------------------------------------------------
-6 | WARNING | Line exceeds 120 characters; contains 129 characters
-----------------------------------------------------------------------
-
-FILE: tests/Unit/SomeServiceTest.php
-------------------------------------------------------------------------------
-FOUND 3 ERRORS AFFECTING 3 LINES
-------------------------------------------------------------------------------
-89 | ERROR | [x] Whitespace found at end of line
-91 | ERROR | [x] Expected 0 spaces before closing parenthesis; 1 found
-92 | ERROR | [x] Space after opening parenthesis of function call prohibited
-------------------------------------------------------------------------------
-PHPCBF CAN FIX THE 3 MARKED SNIFF VIOLATIONS AUTOMATICALLY
-------------------------------------------------------------------------------
+{{ $assist->binCommand('phpcbf') }} --basepath=./ -q ./
+{{ $assist->binCommand('phpcs') }} --basepath=./ --report=full -s -q ./
 ```
 
-## PHP Code Beautifier and Fixer
+## Execution procedure
 
-This program will attempt to automatically fix code violations. It accepts most of the same options as `phpcs`.
+1. Run `phpcbf` first.
+2. If output is `No violations were found`, stop; style is clean.
+3. Otherwise, run `phpcs` once with `--report=full -s`.
+4. Build a violation worklist from `file`, `line`, `message`, and `sniff code`.
+5. Fix all reported issues in code.
+6. Do not re-run `phpcbf` or `phpcs` during active fixing; re-run after all known violations are addressed.
+7. Re-run `phpcbf` to verify final pass.
 
-### Pass Results
+## Understanding non-fixable violations
 
-A `phpcbf` run is considered a pass if there were no violations.
+When `phpcbf` cannot fully resolve issues (`No fixable errors were found` or remaining violations):
 
-If there were no violations, the output will look like:
+- Treat `phpcs --report=full -s` output as the source of truth for `file`, `line`, `message`, and `sniff code`.
+- If the fix is obvious from the message and surrounding code, apply it directly.
+- If the violation meaning, intent, or safe fix is unclear, invoke the `phpcs-violations` skill before editing.
+- Use `phpcs-violations` to inspect the local PHPCS standard docs, sniff class, and ruleset overrides for that specific sniff.
+
+## Report strategy for agents
+
+- Prefer `--report=full -s` when `phpcs` is needed because it provides file, line, message, and sniff code for deterministic fixes.
+- Avoid `--report=summary` for fixing loops; it is shorter but omits violation-level detail and increases follow-up cycles.
+- Avoid reports like `--report=json` which often include all scanned files and increase tokens for agent workflows.
+
+## Result handling
+
+Treat `phpcbf` outcomes as:
+- **Pass**: `No violations were found`.
+- **Non-pass**: violations exist, regardless of whether some were auto-fixed.
+- **Non-fixable**: `No fixable errors were found`; if the fix is not already clear, invoke `phpcs-violations`, understand the sniff, then make edits.
+
+## Formatter interaction
+
+If the project uses Pint, run it after PHPCS violations are resolved:
+
 ```bash
-$ {{ $assist->binCommand('phpcbf') }} --basepath=./ -q ./
-
-No violations were found
+{{ $assist->binCommand('pint') }} --dirty --format agent
 ```
 
-### Fail Results
+Then run final PHPCS verification again:
 
-A `phpcbf` run is considered a fail if there were violations found, regardless of if they have been fixed or not.
-
-If some violations were fixed but others could not be, the output will look like:
 ```bash
-$ {{ $assist->binCommand('phpcbf') }} --basepath=./ -q ./
-
-PHPCBF RESULT SUMMARY
------------------------------------------------------------------------------------
-FILE                                                               FIXED  REMAINING
------------------------------------------------------------------------------------
-/var/www/html/app/Models/User.php                                  3      1
-/var/www/html/tests/Unit/SomeServiceTest.php                       3      0
------------------------------------------------------------------------------------
-A TOTAL OF 6 ERRORS WERE FIXED IN 2 FILES
------------------------------------------------------------------------------------
+{{ $assist->binCommand('phpcbf') }} --basepath=./ -q ./
 ```
 
-If violations were found, but none of them could be fixed, the output will look like:
-```bash
-$ {{ $assist->binCommand('phpcbf') }} --basepath=./ -q ./
-
-No fixable errors were found
-```
-
-**NB**: It is important to note that a file will only appear in this list if it contained violations that could be fixed. Files with _only_ unfixable violations will not appear in this list.
+If Pint and PHPCS conflict, prioritize the rules that CI enforces. If both cannot pass together, stop and report the conflicting files/sniffs instead of looping.
