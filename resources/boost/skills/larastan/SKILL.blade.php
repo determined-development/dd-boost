@@ -1,6 +1,6 @@
 ---
 name: larastan
-description: "Agent runbook for validating PHP changes with PHPStan/Larastan, interpreting findings, and resolving only change-related issues without suppressions."
+description: "Activate before finalizing whenever one or more PHP files have been created or modified. Runs PHPStan/Larastan static analysis, identifies findings introduced by the current changes, and resolves them without suppressions or baseline entries."
 ---
 @php
     /** @var \Laravel\Boost\Install\GuidelineAssist $assist */

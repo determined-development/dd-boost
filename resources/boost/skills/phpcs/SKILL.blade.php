@@ -1,6 +1,6 @@
 ---
 name: phpcs
-description: "Agent runbook for PHP coding standards: run phpcbf first, run phpcs only when needed, then invoke the phpcs-violations skill only when a violation needs deeper interpretation before editing."
+description: "Activate before finalizing whenever one or more PHP files have been created or modified. Runs phpcbf to auto-fix coding standard violations, then runs phpcs to check for remaining issues, and invokes the phpcs-violations skill only when a remaining violation requires deeper interpretation."
 ---
 @php
     /** @var \Laravel\Boost\Install\GuidelineAssist $assist */

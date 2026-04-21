@@ -1,6 +1,6 @@
 ---
 name: testing
-description: "Agent runbook for adding or updating Laravel tests with consistent structure, realistic setup, and clear scope."
+description: "Activate when a new feature is implemented, a bug is fixed, or the user explicitly requests tests. Adds or updates Laravel tests with consistent structure, realistic setup, and clear scope covering the changed behaviour."
 ---
 # Test Authoring Runbook
 

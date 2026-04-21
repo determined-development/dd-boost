@@ -1,6 +1,6 @@
 ---
 name: chopping-code
-description: "Agent runbook for resolving PHPCS line-length violations (>120 chars) that are not auto-fixable. Preserve behavior, improve readability, and keep peer formatting consistent."
+description: "Activate when PHPCS reports line-length violations exceeding 120 characters that phpcbf could not automatically fix. Resolves those violations by restructuring code while preserving behavior and keeping formatting consistent."
 ---
 # Chopping Down Code
 

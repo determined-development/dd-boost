@@ -1,6 +1,6 @@
 ---
 name: phpcs-violations
-description: "Use this skill only when a PHPCS violation is unclear after running phpcs with --report=full -s. Prefer PHPCS docs first, inspect sniff code only if docs are missing or insufficient, and stop early when PHPCS or the required standard is not installed."
+description: "Activate when a PHPCS violation reported by phpcs --report=full -s is unclear and cannot be resolved from the error message alone. Looks up the sniff rule to clarify intent before editing. Do not activate when phpcs is not installed or the required standard is missing."
 ---
 # PHPCS Violation Lookup
 
