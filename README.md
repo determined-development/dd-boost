@@ -5,6 +5,14 @@
 
 This repository contains custom Laravel Boost skills and guidance used by Determined Development projects.
 
+## Installation
+
+```bash
+composer require --dev determined-development/dd-boost
+```
+
+Then update or install boost as per the [Laravel Boost documentation](https://laravel.com/docs/13.x/boost#keeping-boost-resources-updated).
+
 ## What this repository is
 
 - A library of Boost skills that can be included in Laravel projects

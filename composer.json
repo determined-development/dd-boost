@@ -3,7 +3,6 @@
     "description": "Determined Development's Skills and guidelines for Laravel Boost",
     "type": "library",
     "require-dev": {
-        "laravel/boost": "^2.4",
         "squizlabs/php_codesniffer": "^4.0",
         "larastan/larastan": "^3.9"
     },
@@ -14,5 +13,8 @@
             "email": "sam@determineddevelopment.com"
         }
     ],
-    "minimum-stability": "stable"
+    "minimum-stability": "stable",
+    "require": {
+        "laravel/boost": "^2.0"
+    }
 }
