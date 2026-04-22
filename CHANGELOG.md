@@ -2,6 +2,13 @@
 
 All notable changes to `dd-boost` will be documented in this file.
 
+## 1.1.0 - 2026-04-22
+
+* Improved trigger instructions.
+* Improved testing skill.
+
+**Full Changelog**: https://github.com/determined-development/dd-boost/compare/1.0.1...1.1.0
+
 ## 1.0.1 Composer badge updates - 2026-04-20
 
 **Full Changelog**: https://github.com/determined-development/dd-boost/compare/1.0.0...1.0.1
