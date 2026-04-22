@@ -32,8 +32,9 @@ Avoid adding ad hoc helper functions inside a test file because they are harder 
 - Prefer model factories over direct database writes so required state and relationships stay realistic.
 - Only bypass factories when the project already has a more appropriate shared test builder or fixture pattern.
 - Build only the records needed for the path under test.
-- Set failure preconditions directly (factories, seed data, support helpers, or targeted DB state) instead of calling the same endpoint or action once just to prepare a second assertion.
-- For dates or other mutable environmental values, avoid hard-coded values; prefer helpers like `now()`, `Carbon::make('-1 month')`, `fake()->dateTimeBetween()`, or `$this->freezeSecond()` so behavior remains stable over time.
+- When testing fallback, preference, or selection logic, include minimal competing records so the test proves the correct choice was made rather than passing because no alternatives existed.
+- Set preconditions directly (factories, seed data, support helpers, or targeted DB state) instead of calling the same endpoint or action once just to prepare a second assertion.
+- For dates or other mutable environmental values, avoid hard-coded values; prefer helpers like `now()`, `Carbon::make('-1 month')`, `fake()->dateTimeBetween()`, or `$this->freezeSecond()` so tests preserve stable relative timing, including against the current date/time.
 - Keep setup obvious from the test body; if setup becomes noisy, extract it to `tests/Support` rather than hiding it in local helpers.
 
 ## Mocking and external services
@@ -52,11 +53,40 @@ Otherwise, prefer exercising real application code without mocking. Do not add a
 
 Use datasets when the same behavior should be verified across multiple meaningful inputs, such as enum cases, roles, or policy outcomes.
 
-- Keep a dataset in the test file when it is only useful there.
+- Use keyed dataset cases (`'school level' => [...]`) for readable failures.
+- Keep a dataset with the test when it is only useful for one test.
+- Refactor to a named, reusable dataset if the same data is used for multiple tests.
 - Move reusable datasets to `tests/Datasets` when multiple files benefit from the same cases.
 - Include all inputs and expected outcomes in the dataset so the test body stays linear.
 - If a dataset would force conditionals inside the test, split it into separate tests or separate datasets.
 - If several inputs should all produce the same result, group only those cases together and keep differing outcomes in another test.
+
+### Prefer Scenario-Driven Tests with Datasets
+
+When testing one behavior across two or more input variants, prefer a single parameterized test with a named `dataset()` over duplicate tests.
+
+- Use one behavior-focused test name.
+- Type test parameters when practical for clarity and safety.
+- If the code under test has a fallback behaviour, include an explicit default case in the dataset.
+
+Example:
+```php
+test('route redirects correctly', function (?EnumType $input, string $expected) {
+    Foo::factory()->createManyQuietly([
+        ['bar' => EnumType::A],
+        ['bar' => EnumType::B],
+        ['bar' => EnumType::C],
+    ]); 
+
+    $this->get(route('foo', array_filter(['bar' => $input])))
+        ->assertRedirect(route('foo.bar', ['baz' => $expected]));
+})->with([
+    'default' => [null, 'expected-a'],
+    'variant a' => [EnumType::A, 'expected-a'],
+    'variant b' => [EnumType::B, 'expected-b'],
+    'variant c' => [EnumType::C, 'expected-c'],
+]);
+```
 
 ## Responsibility and path coverage
 
