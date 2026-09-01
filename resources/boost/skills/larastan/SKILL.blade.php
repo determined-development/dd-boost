@@ -27,14 +27,9 @@ Use this skill when PHP files change and static analysis must be validated with 
 
 1. Confirm whether any PHP files were changed.
 2. If no PHP files changed, skip this skill.
-3. Run PHPStan once with `--error-format json`.
-4. Build a worklist from the JSON output using `file`, `line`, `message`, and `identifier` when present.
-5. Classify each finding:
-   - introduced by current changes
-   - pre-existing and unrelated
-6. Fix only findings introduced by current changes.
-7. Re-run the same command to verify a clean result for change-related issues.
-8. If there were pre-existing violations, report these to the user, but do not attempt to resolve them.
+3. Fix only findings introduced by current changes.
+4. Re-run the same command to verify a clean result for change-related issues.
+5. If there were pre-existing violations, report them to the user, but do not attempt to resolve them unless explicitly asked to.
 
 ## Interpreting reported errors
 
@@ -42,7 +37,7 @@ Use this skill when PHP files change and static analysis must be validated with 
 - Use `identifier` to understand the exact rule category and to find official guidance.
 - Prefer real type improvements (native type hints, precise return types, accurate generics) over workaround annotations.
 - If a violation depends on framework behavior, check Larastan guidance first, then apply the least invasive code change.
-- If uncertain whether an error is new, report the violation to the user and seek guidance if it needs to be resolved. Justify why you feel it is or is not related to your changes.
+- If uncertain whether an error is new, report it and ask whether it should be resolved.
 
 ## Interpreting configuration safely
 
@@ -52,7 +47,7 @@ Check project configuration in this order, if present:
 2. `phpstan.neon.dist`
 3. included NEON files referenced by `includes`
 
-When reading config, focus on:
+Focus on:
 
 - active analysis level and paths
 - Larastan extension includes
@@ -67,10 +62,10 @@ Do not weaken analysis to pass checks:
 
 ## Project-specific PHPStan extensions
 
-Create a custom PHPStan extension only when the same annotations or ignores are repeatedly used and an extension would be significantly clearer.
+Create a custom PHPStan extension only when the same annotations or ignores are repeatedly used and an extension is clearly better.
 
 - First prefer regular fixes: stronger native types, better PHPDoc, Larastan-supported patterns, or targeted stubs.
-- If repeated local workarounds still appear, extract that logic into a reusable extension instead of adding more inline annotations.
+- If repeated local workarounds still appear, extract that logic into a reusable extension.
 - Keep extension classes out of the `App` namespace; use a dedicated analysis namespace (for example `Dev\\PHPStan\\`).
 - Register extension classes in `composer.json` under `autoload-dev` so they remain development-only.
 
