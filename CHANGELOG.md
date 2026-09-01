@@ -2,6 +2,14 @@
 
 All notable changes to `dd-boost` will be documented in this file.
 
+## 1.2.0 - 2026-09-01
+
+### What's Changed
+
+* Skills overhaul by @samlev in https://github.com/determined-development/dd-boost/pull/1
+
+**Full Changelog**: https://github.com/determined-development/dd-boost/compare/1.1.0...1.2.0
+
 ## 1.1.0 - 2026-04-22
 
 * Improved trigger instructions.
