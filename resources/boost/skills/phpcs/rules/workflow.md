@@ -5,5 +5,5 @@
 3. Run `phpcbf` first.
 4. If `phpcbf` returns anything other than `No violations were found`, run `phpcs --report=full -s`.
 5. Use the configured standard, not project-specific opinion, to decide what the reported violation means.
-6. After fixing any violations run `phpcs` again to validate that the issues have been resolved.
+6. After fixing any violations, run `phpcs --report=full -s` again.
 7. If the same violation keeps returning after a reasonable fix attempt, stop and ask the user for guidance instead of spinning.
