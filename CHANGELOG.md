@@ -2,6 +2,14 @@
 
 All notable changes to `dd-boost` will be documented in this file.
 
+## 1.2.1 - 2026-09-01
+
+### What's Changed
+
+* PHPCS skill updates by @samlev in https://github.com/determined-development/dd-boost/pull/2
+
+**Full Changelog**: https://github.com/determined-development/dd-boost/compare/1.2.0...1.2.1
+
 ## 1.2.0 - 2026-09-01
 
 ### What's Changed
